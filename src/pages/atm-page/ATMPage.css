@@ -1,0 +1,204 @@
+.atm-section .atm-header {
+  background-color: #fff;
+  color: #35598d;
+  padding: 10px 20px;
+  text-align: right;
+  position: fixed;
+  width: 100%;
+  font-size: 16px;
+}
+
+.atm-header .container-fluid {
+  display: flex;
+  justify-content: space-between;
+}
+
+.atm-section .atm-header p {
+  margin: 0;
+}
+
+.atm-section .atm-header i {
+  font-size: 36px;
+  vertical-align: middle;
+  margin: 0 10px;
+  font-weight: bold;
+}
+
+.atm-section .atm-header .name {
+  font-weight: bold;
+}
+
+.atm {
+  display: flex;
+  align-items: center;
+  height: 100vh;
+}
+
+.buttons {
+  background-color: #0367a6;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  align-items: end;
+  gap: 20px;
+}
+
+.buttons-left {
+  align-items: end;
+  padding-right: 20px;
+}
+
+.buttons-right {
+  align-items: start;
+  padding-left: 20px;
+}
+
+.buttons button {
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+  width: 78px;
+  height: 50px;
+  margin-bottom: 30px;
+  box-shadow: 0px 3px 6px #002136;
+}
+
+.buttons button:active {
+  box-shadow: none;
+}
+
+.buttons-left button {
+  background: url("assets/img/btn-atm-left.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.buttons-right button {
+  background: url("assets/img/btn-atm-right.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.screen {
+  background: url("../../assets/img/bg.png") no-repeat;
+  background-size: cover;
+  width: 100%;
+  height: 80vh;
+  position: relative;
+  color: #ffffff;
+  text-shadow: 0px 3px 6px #0367a6;
+  opacity: 1;
+}
+
+.options {
+  width: 100%;
+  height: 200px;
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 30px 30px;
+}
+
+.options h2 {
+  font-size: 27px;
+}
+
+.options h2.disabled {
+  opacity: 0.5;
+}
+
+.options-left,
+.options-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  align-items: flex-start;
+  gap: 60px;
+}
+
+.options-right {
+  align-items: flex-end;
+}
+
+.main-text {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  transform: translate(-50%);
+}
+
+.bottom-text {
+  position: absolute;
+  left: 50%;
+  bottom: 30%;
+  transform: translate(-50%);
+}
+
+.bottom-text {
+  position: absolute;
+  left: 50%;
+  bottom: 10%;
+  transform: translate(-50%);
+}
+
+.fmm-video {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.main-text input {
+  margin-top: 10px;
+  border: none;
+  border-radius: 10px;
+  padding: 5px 10px;
+  font-size: 36px;
+  text-align: center;
+  letter-spacing: 8px;
+}
+
+.phone-container {
+  background: url("assets/img/smartphone.png") no-repeat;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%);
+  bottom: 20px;
+  height: 800px;
+  width: 400px;
+  background-size: contain;
+}
+
+.phone-container .phone-content {
+  position: absolute;
+  top: 20%;
+  text-align: center;
+  width: 100%;
+  color: #fff;
+}
+
+.phone-container .phone-content input {
+  background: #ffffff63;
+  color: #333;
+  padding: 10px 20px;
+  font-size: 24px;
+  width: 70%;
+  border: 0;
+  border-radius: 10px;
+  letter-spacing: 2px;
+  font-weight: bold;
+}
+
+.phone-container .phone-content input.text-key {
+  letter-spacing: 10px;
+  font-size: 22px;
+  font-weight: bold;
+}

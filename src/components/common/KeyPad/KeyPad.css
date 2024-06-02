@@ -1,0 +1,48 @@
+.keypad {
+  position: absolute !important;
+  bottom: -10%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgb(255 255 255);
+  display: table;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+button.btn-keypad {
+  background: rgb(189, 184, 181);
+  background: linear-gradient(
+    180deg,
+    rgba(189, 184, 181, 1) 0%,
+    rgba(132, 127, 124, 1) 100%
+  );
+  border: 1px solid gray;
+  height: 80px;
+  width: 80px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgb(249 250 251 / 70%);
+}
+
+button.btn-keypad:focus,
+button.btn-keypad:hover,
+button.btn-keypad:active {
+  color: #333;
+  background: rgb(189, 184, 181);
+  background: linear-gradient(
+    0deg,
+    rgba(189, 184, 181, 1) 0%,
+    rgba(132, 127, 124, 1) 100%
+  );
+  border-top: solid 1px rgb(157 157 157 / 5%);
+}
+
+.keypad .btn-lg {
+  height: 80px;
+  width: 120px;
+  border: 1px solid gray;
+}
+
+.keypad button i {
+  font-size: 26px;
+}

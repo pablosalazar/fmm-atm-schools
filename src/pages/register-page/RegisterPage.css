@@ -1,0 +1,27 @@
+.register-page {
+  background: url("../../assets/img/bg.png") no-repeat;
+  background-size: cover;
+  height: 100vh;
+  padding-top: 30px;
+}
+
+.form-register header {
+  background-color: #0367a6;
+  color: #fff;
+  text-align: center;
+  padding: 20px 0;
+}
+
+.form-register-content {
+  background-color: #fff;
+  padding: 40px;
+}
+
+.form-register .form-check {
+  max-width: 400px;
+  margin: 40px auto;
+}
+
+.f_req {
+  color: red;
+}

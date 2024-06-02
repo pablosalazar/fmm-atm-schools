@@ -1,0 +1,21 @@
+.phone-keypad {
+  position: absolute !important;
+  bottom: 20px;
+  left: 50%;
+  transform: translate(-50%);
+}
+
+.btn.btn-phone-keypad {
+  width: 90px;
+  height: 90px;
+  color: #fff !important;
+  font-size: 30px;
+  position: absolute;
+  bottom: 40px;
+  background-color: #ffffff4a;
+}
+
+.btn.btn-phone-keypad:hover,
+.btn.btn-phone-keypad:active {
+  background-color: #ffffff80;
+}
