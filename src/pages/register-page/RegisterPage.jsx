@@ -1,114 +1,158 @@
+import React, { useEffect, useState } from "react";
+
+import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import Loader from "components/common/Loader/Loader";
-import RegisterForm from "components/forms/RegisterForm";
-import React, { createRef, useState } from "react";
-import { NavLink } from "react-router-dom";
-import { createUser, getUserByDocumentNumber } from "service/user.service";
+import SchoolForm from "components/forms/SchoolForm";
 
 import "./RegisterPage.css";
+import { useRef } from "react";
+import {
+  createSchool,
+  deleteSchool,
+  getSchools,
+  updateSchool,
+} from "service/school.service";
 
 const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [wasRegisteredSuccessfully, setWasRegisteredSuccessfully] =
-    useState(false);
+  const [schools, setSchools] = useState([]);
+  const [selectedSchool, setSelectedSchool] = useState(null);
+  const [show, setShow] = useState(false);
+  const formRef = useRef(null);
 
-  const formRef = createRef(null);
+  useEffect(() => {
+    get();
+  }, []);
 
-  const handleSubmitForm = async () => {
+  useEffect(() => {
+    if (selectedSchool) {
+      setShow(true);
+    }
+  }, [selectedSchool]);
+
+  const handleClose = () => {
+    setShow(false);
+    setSelectedSchool(null);
+  };
+
+  const get = async () => {
+    setIsLoading(true);
+    const response = await getSchools();
+    setSchools(response);
+    setIsLoading(false);
+  };
+
+  const save = async () => {
     const form = formRef.current;
-    await form.submitForm();
-    if (form.isValid) {
-      const formData = form.values;
-      const data = {
-        ...formData,
-        documentType: formData.documentType.value,
-        department: formData.department.value,
-        municipality: formData.municipality.value,
-        gender: formData.gender.value,
-      };
-
-      const user = await getUserByDocumentNumber(data.documentNumber);
-
-      if (user) {
-        setErrorMessage("Este usuario ya se encuentra registrado");
+    await form?.submitForm();
+    if (form?.isValid) {
+      setIsLoading(true);
+      if (selectedSchool) {
+        await updateSchool(selectedSchool.id, form.values);
       } else {
-        setIsLoading(true);
-        try {
-          await createUser(data);
-          setWasRegisteredSuccessfully(true);
-        } catch (error) {
-          setErrorMessage(
-            "¡Ups! Se ha producido un error, por favor intentalo de nuevo"
-          );
-        } finally {
-          setIsLoading(false);
-        }
+        await createSchool(form.values);
       }
+
+      setShow(false);
+      get();
     }
   };
 
-  const resetForm = () => {
-    window.location.reload();
+  const remove = async (id) => {
+    setIsLoading(true);
+    await deleteSchool(id);
+    get();
   };
 
   return (
-    <div className='register-page'>
-      <div className='container'>
-        <div className='form-register'>
-          {/* <header>
-            <h1>REGISTRO</h1>
-          </header> */}
-          <div className='form-register-content'>
-            {!wasRegisteredSuccessfully ? (
-              <>
-                {isLoading && <Loader />}
-                {errorMessage && (
-                  <div className='alert alert-danger'>{errorMessage}</div>
-                )}
-                <RegisterForm formEl={formRef} />
-                <div className='row'>
-                  <div className='col-md-12 text-center'>
-                    <button
-                      className='btn btn-orange'
-                      type='button'
-                      onClick={handleSubmitForm}
-                    >
-                      Registrarme
-                    </button>
-                  </div>
+    <div className="register-page">
+      {isLoading && <Loader />}
+      <div className="container">
+        <div className="card">
+          <div className="card-body">
+            <h2>Instituciones</h2>
+            <div className="text-end mb-3">
+              <button
+                type="text"
+                className="btn btn-primary"
+                onClick={() => setShow(true)}
+              >
+                Nuevo
+              </button>
+            </div>
 
-                  <div className='d-flex justify-content-between mt-4'>
-                    <NavLink to='/iniciar-sesion' className='btn btn-link'>
-                      Volver al inicio
-                    </NavLink>
-                    <button
-                      type='button'
-                      className='btn btn-link'
-                      onClick={resetForm}
-                    >
-                      Limpiar formulario
-                    </button>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className='alert alert-success'>
-                  Registro exitoso, da click en el boton para seguir
-                  registrando, o da click{" "}
-                  <NavLink to='/iniciar-sesion'>aquí</NavLink> para regresar al
-                  inicio
-                </div>
-                <div className='text-center'>
-                  <button className='btn btn-orange' onClick={resetForm}>
-                    Reiniciar
-                  </button>
-                </div>
-              </>
-            )}
+            <table className="table table-bordered table-striped shadow-sm">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Institución</th>
+                  <th>Codígo</th>
+                  <th>Fecha de registro</th>
+                </tr>
+              </thead>
+              <tbody>
+                {schools.length === 0 && (
+                  <tr>
+                    <td colSpan="4" className="text-center">
+                      No hay datos
+                    </td>
+                  </tr>
+                )}
+                {schools.map((school, index) => (
+                  <tr key={school.id}>
+                    <td>{index + 1}</td>
+                    <td>{school.name}</td>
+                    <td>{school.code}</td>
+                    <td>
+                      {new Date(school.createdAt?.toDate()).toLocaleString(
+                        "en-GB"
+                      )}
+                    </td>
+                    <td>
+                      <button
+                        className="btn btn-sm btn-primary me-3"
+                        onClick={() => setSelectedSchool(school)}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => remove(school.id)}
+                      >
+                        Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
+      <Modal isOpen={show} toggle={() => setShow(!show)} backdrop="static">
+        <ModalHeader>
+          {selectedSchool ? "Actualizar" : "Ingresar"} Institución
+        </ModalHeader>
+        <ModalBody>
+          <SchoolForm formEl={formRef} selectedSchool={selectedSchool} />
+        </ModalBody>
+        <ModalFooter className="justify-content-end">
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm"
+            onClick={handleClose}
+          >
+            Cerrar
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            onClick={save}
+          >
+            {selectedSchool ? "Actualizar" : "Ingresar"}
+          </button>
+        </ModalFooter>
+      </Modal>
     </div>
   );
 };
