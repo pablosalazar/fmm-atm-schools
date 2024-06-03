@@ -12,6 +12,8 @@ import {
   getSchools,
   updateSchool,
 } from "service/school.service";
+import moment from "moment";
+import Swal from "sweetalert2";
 
 const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -59,9 +61,20 @@ const RegisterPage = () => {
   };
 
   const remove = async (id) => {
-    setIsLoading(true);
-    await deleteSchool(id);
-    get();
+    Swal.fire({
+      title: "Borrar Institución?",
+      text: "Confirmas que quieres borrar esta institución",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Si",
+      cancelButtonText: "Cancelar",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        setIsLoading(true);
+        await deleteSchool(id);
+        get();
+      }
+    });
   };
 
   return (
@@ -80,8 +93,8 @@ const RegisterPage = () => {
                 Nuevo
               </button>
             </div>
-
-            <table className="table table-bordered table-striped shadow-sm">
+            <p>Total instituciones: {schools.length}</p>
+            <table className="table table-bordered table-striped table-sm shadow-sm">
               <thead>
                 <tr>
                   <th>#</th>
@@ -104,9 +117,7 @@ const RegisterPage = () => {
                     <td>{school.name}</td>
                     <td>{school.code}</td>
                     <td>
-                      {new Date(school.createdAt?.toDate()).toLocaleString(
-                        "en-GB"
-                      )}
+                      {moment(school.createdAt?.toDate()).format("DD/MM/YYYY")}
                     </td>
                     <td>
                       <button

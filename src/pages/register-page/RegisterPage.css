@@ -9,3 +9,8 @@
 .register-page .card {
   min-height: 90vh;
 }
+
+
+.register-page .table td {
+  vertical-align: middle;
+}
