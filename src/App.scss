@@ -33,11 +33,11 @@ form .text-danger {
 
 .form-login .keypad {
   position: absolute !important;
-  top: 260px;
-  bottom: none;
+  top: 200px;
   display: table;
   left: 50%;
   transform: translateX(-50%);
+  z-index: 1;
 }
 
 /*btn*/

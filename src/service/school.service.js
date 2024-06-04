@@ -2,6 +2,20 @@ import { db } from "helpers/Firebase";
 
 const collectionName = "schools";
 
+export const getSchoolByCode = async (code) => {
+  const query = db.collection(collectionName).where("code", "==", code);
+  const querySnapshot = await query.get();
+  const school = querySnapshot.docs.map((doc) => {
+    const school = doc.data();
+    return {
+      id: doc.id,
+      ...school,
+    };
+  });
+
+  return school;
+};
+
 export const getSchools = async () => {
   const query = db.collection(collectionName).orderBy("createdAt", "desc");
   const querySnapshot = await query.get();

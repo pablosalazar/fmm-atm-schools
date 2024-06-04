@@ -1,98 +1,145 @@
-import React, { useContext, useRef, useState } from "react";
-import { Formik } from "formik";
+import React, { useContext, useEffect, useState } from "react";
+import { useFormik } from "formik";
 import KeyPad from "components/common/KeyPad/KeyPad";
 import { UserContext } from "context/UserContext";
 
 const validate = (values) => {
   const errors = {};
 
-  if (!values.documentNumber) {
-    errors.documentNumber = "Por favor ingresa tu número de documento";
-  } else if (!values.documentNumber.match(/^[0-9]+$/)) {
-    errors.documentNumber = "Por favor ingresa solo números";
-  } else if (values.documentNumber.length < 4) {
-    errors.documentNumber = "Por favor ingresa más de 5 digitos";
+  if (!values.schoolCode) {
+    errors.schoolCode = "Código de la institución requerido";
+  } else if (values.schoolCode.length > 3) {
+    errors.schoolCode =
+      "Código de la institución no puede ser mayor a 3 dígitos";
+  }
+
+  if (!values.age) {
+    errors.age = "Edad requerida";
+  } else if (isNaN(values.age)) {
+    errors.age = "Edad debe ser un número";
+  } else if (values.age.length > 2) {
+    errors.age = "Edad no puede ser mayor a 2 dígitos";
+  }
+
+  if (!values.gender) {
+    errors.gender = "Género requerido";
   }
 
   return errors;
 };
 
-const LoginForm = ({ formEl, signIn }) => {
+const LoginForm = ({ formEl }) => {
   const { playPressButtonSound } = useContext(UserContext);
-  const inputEl = useRef(null);
-  const [isKeyPadOpen, setIsKeyPadOpen] = useState(false);
-  const [fields, setFields] = useState({
-    documentNumber: "",
+  const [focusedInput, setFocusedInput] = useState(null);
+
+  const formik = useFormik({
+    initialValues: {
+      schoolCode: "",
+      gender: "",
+      age: "",
+    },
+    validate,
+    validateOnMount: true,
+    onSubmit: () => {
+      setFocusedInput(null);
+    },
   });
 
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setFields({
-      ...fields,
-      [name]: value,
-    });
-  };
+  useEffect(() => {
+    formEl.current = formik;
+  }, [formik, formEl]);
 
   const handleAddNumber = (num) => {
     playPressButtonSound();
-    inputEl.current.value = inputEl.current.value + num;
-    setFields({
-      ...fields,
-      documentNumber: inputEl.current.value,
-    });
+    formik.setFieldValue(focusedInput, formik.values[focusedInput] + num);
   };
 
   const handleDeleteNumber = () => {
     playPressButtonSound();
-    if (inputEl.current.value) {
-      inputEl.current.value = inputEl.current.value.slice(0, -1);
-      setFields({
-        ...fields,
-        documentNumber: inputEl.current.value,
-      });
-    }
+    formik.setFieldValue(
+      focusedInput,
+      formik.values[focusedInput].substring(
+        0,
+        formik.values[focusedInput].length - 1
+      )
+    );
   };
 
   return (
-    <div className='form-login'>
-      <Formik
-        enableReinitialize
-        innerRef={formEl}
-        initialValues={{
-          ...fields,
-        }}
-        validateOnMount
-        validate={validate}
-        onSubmit={() => {}}
-      >
-        {({ errors, touched }) => (
-          <form autoComplete='off'>
+    <div className="form-login">
+      <form autoComplete="off">
+        <div className="mb-4">
+          <input
+            name="schoolCode"
+            type="text"
+            placeholder="Código de la institución"
+            className="form-control"
+            onChange={formik.handleChange}
+            value={formik.values.schoolCode}
+            onFocus={() => {
+              setFocusedInput("schoolCode");
+            }}
+          />
+          {formik.touched.schoolCode && formik.errors.schoolCode ? (
+            <div className="text-danger">{formik.errors.schoolCode}</div>
+          ) : null}
+        </div>
+        <div className="mb-4">
+          <input
+            name="age"
+            type="text"
+            placeholder="¿Cuantos años tienes?"
+            className="form-control"
+            onChange={formik.handleChange}
+            value={formik.values.age}
+            onFocus={() => {
+              setFocusedInput("age");
+            }}
+          />
+          {formik.touched.age && formik.errors.age ? (
+            <div className="text-danger">{formik.errors.age}</div>
+          ) : null}
+        </div>
+        <div className="d-flex justify-content-evenly">
+          <div className="form-check form-check-inline">
             <input
-              ref={inputEl}
-              type='text'
-              name='documentNumber'
-              value={fields.name}
-              className='form-control'
-              onChange={handleInputChange}
-              placeholder='Número de documento'
-              onFocus={() => {
-                setIsKeyPadOpen(true);
-              }}
+              className="form-check-input"
+              type="radio"
+              name="gender"
+              id="gender1"
+              value="hombre"
+              onChange={formik.handleChange}
             />
-            {errors.documentNumber && touched.documentNumber && (
-              <div className='text-danger'>{errors.documentNumber}</div>
-            )}
-          </form>
-        )}
-      </Formik>
-      {isKeyPadOpen && (
+            <label className="form-check-label" for="gender1">
+              Hombre
+            </label>
+          </div>
+          <div className="form-check form-check-inline">
+            <input
+              className="form-check-input"
+              type="radio"
+              name="gender"
+              id="gender2"
+              value="mujer"
+              onChange={formik.handleChange}
+            />
+            <label className="form-check-label" for="gender2">
+              Mujer
+            </label>
+          </div>
+        </div>
+        {formik.touched.gender && formik.errors.gender ? (
+          <div className="text-danger">{formik.errors.gender}</div>
+        ) : null}
+      </form>
+
+      {focusedInput && (
         <KeyPad
           handleAddNumber={handleAddNumber}
           handleDeleteNumber={handleDeleteNumber}
           onClose={() => {
             playPressButtonSound();
-            setIsKeyPadOpen(false);
-            signIn();
+            setFocusedInput(null);
           }}
         />
       )}

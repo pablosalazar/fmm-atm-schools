@@ -1,5 +1,9 @@
-.login-page input {
+.login-page input[type="text"] {
   padding: 10px 30px;
   border: 2px solid #0367a6;
+  font-size: 20px;
+}
+
+.login-page .form-check {
   font-size: 20px;
 }

@@ -2,11 +2,12 @@ import LoginForm from "components/forms/LoginForm";
 import React, { createRef, useContext, useState } from "react";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import Loader from "components/common/Loader/Loader";
-import { getUserByDocumentNumber } from "service/user.service";
 import { NavLink, useNavigate } from "react-router-dom";
 import { UserContext } from "context/UserContext";
 
 import "./LoginPage.css";
+import { getSchoolByCode } from "service/school.service";
+import { createStudent } from "service/student.service";
 
 const LoginPage = () => {
   const { setUser } = useContext(UserContext);
@@ -25,22 +26,26 @@ const LoginPage = () => {
 
     if (form.isValid) {
       try {
-        const { documentNumber } = form.values;
+        const { schoolCode } = form.values;
         setIsLoading(true);
-        const user = await getUserByDocumentNumber(documentNumber);
-        if (user) {
-          const userData = {
-            id: user.id,
-            fullname: `${user.firstname}  ${user.lastname}`,
-            documentNumber: user.documentNumber,
-            phone: user.phone,
-          };
-          localStorage.setItem("user", JSON.stringify(userData));
+        const school = await getSchoolByCode(schoolCode);
 
-          setUser(userData);
+        if (school.length > 0) {
+          const student = {
+            schoolId: school[0].id,
+            schoolName: school[0].name,
+            schoolCode: school[0].code,
+            gender: form.values.gender,
+            age: form.values.age,
+          };
+
+          createStudent(student);
+
+          localStorage.setItem("user", JSON.stringify(school));
+          setUser(student);
           navigate("/cajero-automatico", { replace: true });
         } else {
-          setErrorMessage("Usuario no encontrado");
+          setErrorMessage("Institución no encontrada");
         }
       } catch (error) {
         console.log(error);
@@ -60,15 +65,14 @@ const LoginPage = () => {
       >
         <ModalHeader>Identifícate</ModalHeader>
         <ModalBody>
-          <p>Para empezar ingresa tu número de documento</p>
-          {errorMessage && <div className="text-danger">{errorMessage}</div>}
-          <LoginForm formEl={formRef} signIn={signIn} />
+          <p>Para empezar ingresa los siguientes datos</p>
+          {errorMessage && (
+            <div className="alert alert-danger">{errorMessage}</div>
+          )}
+          <LoginForm formEl={formRef} />
           {isLoading && <Loader />}
         </ModalBody>
         <ModalFooter className="justify-content-end">
-          <NavLink to="/registrar" className="btn btn-link">
-            ¿Aún no estas registrado?
-          </NavLink>
           <button className="btn btn-orange" onClick={signIn}>
             Ingresar
           </button>

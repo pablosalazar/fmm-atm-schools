@@ -35,40 +35,40 @@ const ATMPage = () => {
   };
 
   return (
-    <div className='atm-section'>
-      <header className='atm-header'>
-        <div className='container-fluid'>
+    <div className="atm-section">
+      <header className="atm-header">
+        <div className="container-fluid">
           <div onClick={logOut}>
-            <i className='bi bi-box-arrow-in-left mr-5'></i>
-            <span className='ml-5'>Salir de la simulación</span>
+            <i className="bi bi-box-arrow-in-left mr-5"></i>
+            <span className="ml-5">Salir de la simulación</span>
           </div>
           <p>
-            Bienvenid@ <span className='name'>{user?.fullname}</span>
-            <i className='bi bi-person'></i>
+            Bienvenido Colegio <span className="name">{user?.schoolName}</span>
+            <i className="bi bi-person"></i>
           </p>
         </div>
       </header>
-      <div className='atm'>
+      <div className="atm">
         <Routes>
-          <Route path='/' element={<ATMStart />} />
-          <Route path='/insertar-tarjeta' element={<ATMInsertCard />} />
-          <Route path='/seleccionar-cuenta' element={<ATMSelectAccount />} />
-          <Route path='/seleccionar-cantidad' element={<ATMSelectMoney />} />
-          <Route path='/consultar-costo' element={<ATMCheckCost />} />
-          <Route path='/ingresar-clave' element={<ATMEnterKey />} />
-          <Route path='/retirar-dinero' element={<ATMGetMoney />} />
-          <Route path='/retirar-recibo' element={<ATMFinish />} />
-          <Route path='/clave-erronea' element={<ATMWrongKey />} />
+          <Route path="/" element={<ATMStart />} />
+          <Route path="/insertar-tarjeta" element={<ATMInsertCard />} />
+          <Route path="/seleccionar-cuenta" element={<ATMSelectAccount />} />
+          <Route path="/seleccionar-cantidad" element={<ATMSelectMoney />} />
+          <Route path="/consultar-costo" element={<ATMCheckCost />} />
+          <Route path="/ingresar-clave" element={<ATMEnterKey />} />
+          <Route path="/retirar-dinero" element={<ATMGetMoney />} />
+          <Route path="/retirar-recibo" element={<ATMFinish />} />
+          <Route path="/clave-erronea" element={<ATMWrongKey />} />
           <Route
-            path='/elige-una-opcion'
+            path="/elige-una-opcion"
             element={<ATMChooseScreenOrReceipt />}
           />
-          <Route path='/ver-saldo' element={<ATMCheckBalance />} />
+          <Route path="/ver-saldo" element={<ATMCheckBalance />} />
           {/* RETIRO DESDE MOVIL */}
-          <Route path='/app' element={<ATMAppStart />} />
-          <Route path='/app-ingresar-clave' element={<ATMAppEnterKey />} />
+          <Route path="/app" element={<ATMAppStart />} />
+          <Route path="/app-ingresar-clave" element={<ATMAppEnterKey />} />
           <Route
-            path='/app-saldo-disponible'
+            path="/app-saldo-disponible"
             element={<ATMAppAvailableBalance />}
           />
         </Routes>

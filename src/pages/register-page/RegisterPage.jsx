@@ -62,7 +62,7 @@ const RegisterPage = () => {
 
   const remove = async (id) => {
     Swal.fire({
-      title: "Borrar Institución?",
+      title: "¿Borrar Institución?",
       text: "Confirmas que quieres borrar esta institución",
       icon: "warning",
       showCancelButton: true,
