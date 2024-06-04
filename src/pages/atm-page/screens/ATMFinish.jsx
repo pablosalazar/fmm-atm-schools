@@ -5,11 +5,16 @@ import { registerActivity } from "service/activity.service";
 import Loader from "components/common/Loader/Loader";
 
 import printTicketVideo from "assets/videos/retirar_recibo.mp4";
+import { useNavigate } from "react-router-dom";
 
 const ATMFinish = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showButton, setShowButton] = useState(false);
   const { user, setUser, startTime, operationType } = useContext(UserContext);
+
+  const [error, setError] = useState(false);
+
+  let navigate = useNavigate();
 
   const save = async () => {
     const endTime = new Date().getTime();
@@ -18,12 +23,18 @@ const ATMFinish = () => {
 
     if (!isNaN(elapsedTime)) {
       setIsLoading(true);
-      await registerActivity({
-        activity: operationType,
-        documentNumber: user.documentNumber,
-        elapsedTime,
-      });
-      logOut();
+      try {
+        await registerActivity({
+          studentId: user.id,
+          activity: operationType,
+          elapsedTime,
+        });
+        navigate("/cajero-automatico");
+      } catch (error) {
+        setError(true);
+      } finally {
+        setIsLoading(false);
+      }
     } else {
       logOut();
     }
@@ -52,6 +63,11 @@ const ATMFinish = () => {
           <button className="btn btn-orange mt-5" onClick={save}>
             Finalizar
           </button>
+          {error && (
+            <div className="alert alert-warning">
+              Hubo un error, sal del simulador y vuelve a ingresar
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -30,19 +30,22 @@ const LoginPage = () => {
         setIsLoading(true);
         const school = await getSchoolByCode(schoolCode);
 
-        if (school.length > 0) {
+        if (school) {
           const student = {
-            schoolId: school[0].id,
-            schoolName: school[0].name,
-            schoolCode: school[0].code,
+            schoolId: school.id,
+            schoolName: school.name,
+            schoolCode: school.code,
             gender: form.values.gender,
             age: form.values.age,
           };
 
-          createStudent(student);
+          const userId = await createStudent(student);
 
-          localStorage.setItem("user", JSON.stringify(school));
-          setUser(student);
+          localStorage.setItem(
+            "user",
+            JSON.stringify({ ...student, id: userId })
+          );
+          setUser({ ...student, id: userId });
           navigate("/cajero-automatico", { replace: true });
         } else {
           setErrorMessage("Institución no encontrada");

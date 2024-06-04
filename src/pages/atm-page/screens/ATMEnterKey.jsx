@@ -75,6 +75,7 @@ function ATMEnterKey() {
               onFocus={() => {
                 setIsKeyPadOpen(true);
               }}
+              autoComplete="off"
             />
             {errorInputMessage && (
               <div className="text-danger">{errorInputMessage}</div>

@@ -13,7 +13,11 @@ export const getSchoolByCode = async (code) => {
     };
   });
 
-  return school;
+  if (school.length) {
+    return school[0];
+  }
+
+  return null;
 };
 
 export const getSchools = async () => {
