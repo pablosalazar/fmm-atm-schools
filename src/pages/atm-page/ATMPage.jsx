@@ -43,7 +43,7 @@ const ATMPage = () => {
             <span className="ml-5">Salir de la simulación</span>
           </div>
           <p>
-            Bienvenido Colegio <span className="name">{user?.schoolName}</span>
+            Bienvenido <span className="name">{user?.schoolName}</span>
             <i className="bi bi-person"></i>
           </p>
         </div>

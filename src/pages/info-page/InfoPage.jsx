@@ -1,85 +1,81 @@
 import React, { useEffect, useState } from "react";
-import { getUsers } from "service/user.service";
+import moment from "moment";
 
+import { getStudents } from "service/student.service";
 import "./InfoPage.css";
-
-const calculateAge = (date) => {
-  const today = new Date();
-  const birthDate = date.toDate();
-
-  var age = today.getFullYear() - birthDate.getFullYear();
-  var m = today.getMonth() - birthDate.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-    age--;
-  }
-  return age;
-};
+import { getActivities } from "service/activity.service";
+import Loader from "components/common/Loader/Loader";
 
 const InfoPage = () => {
-  const [users, setUsers] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      const items = await getUsers();
-      setUsers(items);
+      setIsLoading(true);
+      let items = await getStudents();
+      const activities = await getActivities();
+
+      items = items.map((item) => {
+        const activity = activities.find(
+          (activity) => activity.studentId === item.id
+        );
+        return {
+          ...item,
+          activityName: activity?.activity || "--",
+          time: activity?.elapsedTime
+            ? `${Math.trunc(activity?.elapsedTime / 1000)} seg`
+            : "--",
+        };
+      });
+      setStudents(items);
+      setIsLoading(false);
     };
 
     fetchData();
   }, []);
 
-  useEffect(() => {
-    if (users.length) {
-      const formattedUsers = users.map((user) => ({
-        Nombre: user.firstname,
-        Apellidos: user.lastname,
-        Documento: `${user.documentType} ${user.documentNumber}`,
-        Departamento: user.department,
-        Municipio: user.municipality,
-        Telefono: user.phone,
-        Edad: `${calculateAge(user.birthdate)} años`,
-      }));
-
-      console.log(JSON.stringify(formattedUsers));
-    }
-  }, [users]);
-
   return (
-    <div className='container'>
-      <div className='info-page'>
-        <h1>Usuarios registrados {users.length}</h1>
-        <div className='table-responsive'>
-          <table className='table'>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Nombre completo</th>
-                <th>Documento</th>
-                <th>Género</th>
-                <th>Ciudad</th>
-                <th>Municipio</th>
-                <th>Edad</th>
-                <th>Teléfono</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user, index) => (
+    <div className="info-container">
+      {isLoading && <Loader />}
+      <div className="container">
+        <div className="info-page">
+          <h1>Número de registros: {students.length}</h1>
+          <hr />
+          <div className="table-responsive">
+            <table className="table">
+              <thead>
                 <tr>
-                  <td>{index + 1}</td>
-                  <td>
-                    {user.firstname} {user.lastname}
-                  </td>
-                  <td>
-                    {user.documentType} {user.documentNumber}
-                  </td>
-                  <td>{user.gender}</td>
-                  <td>{user.department}</td>
-                  <td>{user.municipality}</td>
-                  <td>{calculateAge(user.birthdate)} años</td>
-                  <td>{user.phone}</td>
+                  <th>#</th>
+                  <th>Nombre Institución</th>
+                  <th>Genero</th>
+                  <th>Edad</th>
+                  <th>Fecha registro</th>
+                  <th>Hora registro</th>
+                  <th>Actividad</th>
+                  <th>Tiempo</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {students.map((student, index) => (
+                  <tr key={student.id}>
+                    <td>{index + 1}</td>
+                    <td>{student.schoolName}</td>
+                    <td>{student.gender}</td>
+                    <td>{student.age} años</td>
+                    <td>
+                      {moment(student.createdAt.toDate()).format("DD-MM-YYYY")}
+                    </td>
+                    <td>
+                      {moment(student.createdAt.toDate()).format("hh:mm A")}
+                    </td>
+                    <td>{student.activityName}</td>
+                    <td>{student.time}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

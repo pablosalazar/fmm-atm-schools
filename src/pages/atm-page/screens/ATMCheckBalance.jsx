@@ -27,7 +27,8 @@ const ATMCheckBalance = () => {
           activity: operationType,
           elapsedTime,
         });
-        navigate("/cajero-automatico");
+        // navigate("/cajero-automatico");
+        logOut();
       } catch (error) {
         setError(true);
       } finally {
