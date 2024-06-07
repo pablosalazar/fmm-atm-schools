@@ -1,18 +1,28 @@
 import React, { useEffect, useState } from "react";
 import moment from "moment";
+import Select from "react-select";
 
 import { getStudents } from "service/student.service";
 import "./InfoPage.css";
 import { getActivities } from "service/activity.service";
 import Loader from "components/common/Loader/Loader";
+import { getSchools } from "service/school.service";
 
 const InfoPage = () => {
   const [students, setStudents] = useState([]);
+  const [filteredStudents, setFilteredStudents] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [eventOptions, setEventOptions] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
+      const schools = await getSchools();
+      setEventOptions(
+        schools.map((school) => ({ value: school.id, label: school.name }))
+      );
+
       let items = await getStudents();
       const activities = await getActivities();
 
@@ -35,13 +45,44 @@ const InfoPage = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (selectedEvent) {
+      const filtered = students.filter(
+        (student) => student.schoolId === selectedEvent.value
+      );
+      setFilteredStudents(filtered);
+    } else {
+      setFilteredStudents(students);
+    }
+  }, [selectedEvent, students]);
+
   return (
     <div className="info-container">
       {isLoading && <Loader />}
       <div className="container">
         <div className="info-page">
-          <h1>Número de registros: {students.length}</h1>
+          <h2>Info</h2>
+          <div className="card">
+            <div className="card-body">
+              <div className="row">
+                <div className="col-md-6  mb-3">
+                  <label>Evento</label>
+                  <Select
+                    onChange={(option) => {
+                      setSelectedEvent(option);
+                    }}
+                    options={eventOptions}
+                    placeholder="Selecciona una opción"
+                    isClearable
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
           <hr />
+          <p>
+            Número de registros: <strong>{filteredStudents.length}</strong>
+          </p>
           <div className="table-responsive">
             <table className="table">
               <thead>
@@ -57,7 +98,7 @@ const InfoPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {students.map((student, index) => (
+                {filteredStudents.map((student, index) => (
                   <tr key={student.id}>
                     <td>{index + 1}</td>
                     <td>{student.schoolName}</td>
