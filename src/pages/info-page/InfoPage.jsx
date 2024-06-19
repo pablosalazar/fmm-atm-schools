@@ -8,6 +8,23 @@ import { getActivities } from "service/activity.service";
 import Loader from "components/common/Loader/Loader";
 import { getSchools } from "service/school.service";
 import DownloadIcon from "./downloadIcon";
+import {
+  ATM_APP_CASH_WITHDRAWAL,
+  ATM_BALANCE_INQUIRY,
+  ATM_CASH_WITHDRAWAL,
+} from "constants/defaultValue";
+
+const genderOptions = [
+  { value: "hombre", label: "Hombre" },
+  { value: "mujer", label: "Mujer" },
+];
+
+const activityOptions = [
+  { value: ATM_CASH_WITHDRAWAL, label: ATM_CASH_WITHDRAWAL },
+  { value: ATM_BALANCE_INQUIRY, label: ATM_BALANCE_INQUIRY },
+  { value: ATM_APP_CASH_WITHDRAWAL, label: ATM_APP_CASH_WITHDRAWAL },
+  { value: "--", label: "No registra actividad" },
+];
 
 const InfoPage = () => {
   const [students, setStudents] = useState([]);
@@ -15,47 +32,82 @@ const InfoPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [eventOptions, setEventOptions] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedGender, setSelectedGender] = useState(null);
+  const [selectedAge, setSelectedAge] = useState(null);
+  const [selectedActivity, setSelectedActivity] = useState(null);
+  const [ageOptions, setAgeOptions] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
-      const schools = await getSchools();
-      setEventOptions(
-        schools.map((school) => ({ value: school.id, label: school.name }))
-      );
-
-      let items = await getStudents();
-      const activities = await getActivities();
-
-      items = items.map((item) => {
-        const activity = activities.find(
-          (activity) => activity.studentId === item.id
+      try {
+        const schools = await getSchools();
+        setEventOptions(
+          schools.map((school) => ({ value: school.id, label: school.name }))
         );
-        return {
-          ...item,
-          activityName: activity?.activity || "--",
-          time: activity?.elapsedTime
-            ? `${Math.trunc(activity?.elapsedTime / 1000)} seg`
-            : "--",
-        };
-      });
-      setStudents(items);
-      setIsLoading(false);
+
+        let items = await getStudents();
+        const activities = await getActivities();
+
+        items = items.map((item) => {
+          const activity = activities.find(
+            (activity) => activity.studentId === item.id
+          );
+          return {
+            ...item,
+            activityName: activity?.activity || "--",
+            time: activity?.elapsedTime
+              ? `${Math.trunc(activity?.elapsedTime / 1000)} seg`
+              : "--",
+          };
+        });
+
+        const ages = [
+          ...new Set(items.map((student) => Number(student.age))),
+        ].sort((a, b) => a - b);
+
+        setAgeOptions(
+          ages.map((age) => ({ value: age, label: `${age} años` }))
+        );
+
+        setStudents(items);
+        setIsLoading(false);
+      } catch (error) {
+        console.error(error);
+        setIsLoading(false);
+      }
     };
 
     fetchData();
   }, []);
 
   useEffect(() => {
+    let filtered = students;
+
     if (selectedEvent) {
-      const filtered = students.filter(
+      filtered = students.filter(
         (student) => student.schoolId === selectedEvent.value
       );
-      setFilteredStudents(filtered);
-    } else {
-      setFilteredStudents(students);
     }
-  }, [selectedEvent, students]);
+
+    if (selectedGender) {
+      filtered = filtered.filter(
+        (student) => student.gender === selectedGender.value
+      );
+    }
+
+    if (selectedAge) {
+      filtered = filtered.filter(
+        (student) => Number(student.age) === selectedAge.value
+      );
+    }
+    if (selectedActivity) {
+      filtered = filtered.filter(
+        (student) => student.activityName === selectedActivity.value
+      );
+    }
+    setFilteredStudents(filtered);
+  }, [selectedEvent, selectedGender, selectedAge, selectedActivity, students]);
 
   const convertToCSV = (data) => {
     if (!data.length) return "";
@@ -109,13 +161,46 @@ const InfoPage = () => {
           <div className="card">
             <div className="card-body">
               <div className="row">
-                <div className="col-md-6  mb-3">
+                <div className="col-md-3  mb-3">
                   <label>Evento</label>
                   <Select
                     onChange={(option) => {
                       setSelectedEvent(option);
                     }}
                     options={eventOptions}
+                    placeholder="Selecciona una opción"
+                    isClearable
+                  />
+                </div>
+                <div className="col-md-3  mb-3">
+                  <label>Genero</label>
+                  <Select
+                    onChange={(option) => {
+                      setSelectedGender(option);
+                    }}
+                    options={genderOptions}
+                    placeholder="Selecciona una opción"
+                    isClearable
+                  />
+                </div>
+                <div className="col-md-3  mb-3">
+                  <label>Edad</label>
+                  <Select
+                    onChange={(option) => {
+                      setSelectedAge(option);
+                    }}
+                    options={ageOptions}
+                    placeholder="Selecciona una opción"
+                    isClearable
+                  />
+                </div>
+                <div className="col-md-3  mb-3">
+                  <label>Actividad</label>
+                  <Select
+                    onChange={(option) => {
+                      setSelectedActivity(option);
+                    }}
+                    options={activityOptions}
                     placeholder="Selecciona una opción"
                     isClearable
                   />
@@ -151,7 +236,7 @@ const InfoPage = () => {
                   <tr key={student.id}>
                     <td>{index + 1}</td>
                     <td>{student.schoolName}</td>
-                    <td>{student.gender}</td>
+                    <td className="text-capitalize">{student.gender}</td>
                     <td>{student.age} años</td>
                     <td>
                       {moment(student.createdAt.toDate()).format("DD-MM-YYYY")}
