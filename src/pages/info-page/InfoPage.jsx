@@ -7,6 +7,7 @@ import "./InfoPage.css";
 import { getActivities } from "service/activity.service";
 import Loader from "components/common/Loader/Loader";
 import { getSchools } from "service/school.service";
+import DownloadIcon from "./downloadIcon";
 
 const InfoPage = () => {
   const [students, setStudents] = useState([]);
@@ -56,12 +57,55 @@ const InfoPage = () => {
     }
   }, [selectedEvent, students]);
 
+  const convertToCSV = (data) => {
+    if (!data.length) return "";
+
+    const csvRows = [];
+    const headers = Object.keys(data[0]);
+    csvRows.push(headers.join(","));
+
+    for (const row of data) {
+      const values = headers.map((header) => {
+        const escape = ("" + row[header]).replace(/"/g, '\\"');
+        return `"${escape}"`;
+      });
+      csvRows.push(values.join(","));
+    }
+
+    return csvRows.join("\n");
+  };
+
+  const donwloadFile = () => {
+    const data = filteredStudents.map((student, index) => ({
+      "#": index + 1,
+      "Nombre Institución": student.schoolName,
+      Genero: student.gender,
+      Edad: `${student.age} años`,
+      "Fecha registro": moment(student.createdAt.toDate()).format("DD-MM-YYYY"),
+      "Hora registro": moment(student.createdAt.toDate()).format("hh:mm A"),
+      Actividad: student.activityName,
+      Tiempo: student.time,
+    }));
+
+    const csvData = convertToCSV(data);
+
+    const blob = new Blob([csvData], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.setAttribute("hidden", "");
+    a.setAttribute("href", url);
+    a.setAttribute("download", "students_data.csv");
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
   return (
-    <div className="info-container">
+    <div className="info-container mb-6">
       {isLoading && <Loader />}
       <div className="container">
         <div className="info-page">
-          <h2>Info</h2>
+          <h2>Eventos Cajero automático</h2>
           <div className="card">
             <div className="card-body">
               <div className="row">
@@ -79,7 +123,12 @@ const InfoPage = () => {
               </div>
             </div>
           </div>
-          <hr />
+          <div className="mt-3 text-end">
+            <button type="button" onClick={donwloadFile}>
+              <DownloadIcon />
+            </button>
+          </div>
+
           <p>
             Número de registros: <strong>{filteredStudents.length}</strong>
           </p>
